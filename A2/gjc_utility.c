@@ -10,6 +10,14 @@
 #include "gjc_options.h"
 #include "gjc_utility.h"
 
+/* This is used to compensate for the extra character spaces taken up by
+   the '\n' and '\0' when user is asked for input through fgets(). */
+#define EXTRA_SPACES 2
+
+/* Specifies the maximum input length a user can enter for the options
+   menu. */
+#define MAX_OPTION_INPUT 1
+
 /****************************************************************************
 * Function readRestOfLine() is used for buffer clearing.
 * Please refer to "test_fgets.c" on Blackboard:
@@ -65,4 +73,47 @@ void displayMenu()
 	printf("(8) Save & Exit\n");
 	printf("(9) Abort\n");
 	printf("Select your option (1-9): ");
+}
+
+/*Check if there is no '\n' in the input, or the input has error.*/
+int validateInput(char input[])
+{
+	if(!strchr(input, '\n') || input==NULL)
+	{			
+		readRestOfLine();
+		return FALSE;
+	}
+	return TRUE;
+}
+
+/*
+  Let the user input which option they'd like to use.
+  If the input is invalid, return FALSE. Otherwise, return 
+  the option number.
+*/
+int inputOption()
+{	
+    char opt[MAX_OPTION_INPUT + EXTRA_SPACES];
+    int option;
+
+    fgets(opt, MAX_OPTION_INPUT + EXTRA_SPACES, stdin);
+
+    /* Check if there's an error in the input */
+    if(validateInput(opt) == FALSE)
+    {
+        return FALSE;
+    }
+
+    /* 
+      Check if the input is invalid, which is less than 1,
+      bigger than 7, or not a number.
+    */	
+    if(*opt<'1' || *opt>'7'|| *(opt+1)!='\n')
+    {
+        return FALSE;
+    }
+
+    option = (int)*opt - 48;
+
+    return option;
 }

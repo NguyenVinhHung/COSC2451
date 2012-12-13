@@ -14,5 +14,8 @@ void readRestOfLine();
 int systemInit(GJCType*);
 int loadData(GJCType*, char*, char*);
 void systemFree(GJCType*);
+void displayMenu();
+int validateInput(char *);
+int inputOption();
 
 #endif
