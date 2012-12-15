@@ -6,6 +6,7 @@
 * Start up code provided by Christopher Hoobin, Xiaodong Li and Quang Tran
 ****************************************************************************/
 
+#include <string.h>
 #include "gjc.h"
 #include "gjc_options.h"
 #include "gjc_utility.h"
@@ -49,6 +50,32 @@ int systemInit(GJCType *menu)
 ****************************************************************************/
 int loadData(GJCType *menu, char *menuFile, char *submenuFile)
 {
+    FILE *mF, *smF; /* menu file & submenu file */
+    char *mRec, *smRec; /* menu record (4 fields) & submenu record (7 fields) */
+
+    mF = fopen(menuFile, "r");
+    smF = fopen(submenuFile, "r");
+
+    if(mF==NULL) /* Print message if menu file cannot be opened */
+    {
+        printf("Menu file cannot be opened\n");
+    }
+
+    if(smF==NULL) /* Print message if submenu file cannot be opened */
+    {
+        printf("Submenu file cannot be opened\n");
+    }
+
+    if(mF==NULL || smF==NULL) /* Abort program if at least one file can't be opened*/
+    {
+        printf("Program abort\n");
+        exit(0);
+    }
+
+    
+
+    fclose(mF);
+    fclose(smF);
 }
 
 
@@ -62,28 +89,28 @@ void systemFree(GJCType *menu)
 /* Display the main menu */
 void displayMenu()
 {
-	printf("Main Menu:\n");
-	printf("(1) Hot Drinks Summary\n");
-	printf("(2) Cold Drinks Summary\n");
-	printf("(3) Detailed Menu Report\n");
-	printf("(4) Add Menu Category\n");
-	printf("(5) Delete Menu Category\n");
-	printf("(6) Add Menu Item\n");
-	printf("(7) Delete Menu Item\n");
-	printf("(8) Save & Exit\n");
-	printf("(9) Abort\n");
-	printf("Select your option (1-9): ");
+    printf("\nMain Menu:\n");
+    printf("(1) Hot Drinks Summary\n");
+    printf("(2) Cold Drinks Summary\n");
+    printf("(3) Detailed Menu Report\n");
+    printf("(4) Add Menu Category\n");
+    printf("(5) Delete Menu Category\n");
+    printf("(6) Add Menu Item\n");
+    printf("(7) Delete Menu Item\n");
+    printf("(8) Save & Exit\n");
+    printf("(9) Abort\n");
+    printf("Select your option (1-9): ");
 }
 
 /*Check if there is no '\n' in the input, or the input has error.*/
 int validateInput(char input[])
 {
-	if(!strchr(input, '\n') || input==NULL)
-	{			
-		readRestOfLine();
-		return FALSE;
-	}
-	return TRUE;
+    if(!strchr(input, '\n') || input==NULL)
+    {			
+        readRestOfLine();
+        return FAILURE;
+    }
+    return SUCCESS;
 }
 
 /*
@@ -99,18 +126,18 @@ int inputOption()
     fgets(opt, MAX_OPTION_INPUT + EXTRA_SPACES, stdin);
 
     /* Check if there's an error in the input */
-    if(validateInput(opt) == FALSE)
+    if(validateInput(opt) == FAILURE)
     {
-        return FALSE;
+        return FAILURE;
     }
 
     /* 
       Check if the input is invalid, which is less than 1,
       bigger than 7, or not a number.
     */	
-    if(*opt<'1' || *opt>'7'|| *(opt+1)!='\n')
+    if(*opt<'1' || *opt>'9'|| *(opt+1)!='\n')
     {
-        return FALSE;
+        return FAILURE;
     }
 
     option = (int)*opt - 48;

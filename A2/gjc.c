@@ -15,13 +15,23 @@ int main(int argc, char* argv[])
     GJCType gjc;
 
     int initFlag, dataFlag;
+    int option;
+
+    /* Check the number of arguments from the command line. */
+    if(argc != 3)
+    {
+        printf("PLease enter a command line with format:\n");
+	printf("./gjc <menufile> <submenufile>\n");
+	printf("Program abort\n");
+	exit(EXIT_SUCCESS);
+    }
 
     /* Initialise the Gloria Jean's Coffee system to a safe empty state. */
     initFlag = systemInit(&gjc);
 
-    /* Populate the Gloria Jean's Coffee system with data from the data files. */
-    /* Uncomment this line when you are ready to use command line arguments:
-    dataFlag = loadData(&gjc, argv[1], argv[2]); */
+    /* Populate the Gloria Jean's Coffee system with data from the data files.*/
+    /* Uncomment this line when you are ready to use command line arguments: */
+    dataFlag = loadData(&gjc, argv[1], argv[2]);
 
     /* Testing to see if both systemInit(.) and loadData(.) are ok */
     if (initFlag == FAILURE || dataFlag == FAILURE)
@@ -33,7 +43,7 @@ int main(int argc, char* argv[])
 	displayMenu();
 	option = inputOption();		
 
-	if(option == FALSE)
+	if(option == FAILURE)
 	{
 	    printf("This option is invalid.\n");
 	    printf("Please enter a valid option, which is from 1 to 9\n\n");
@@ -41,17 +51,17 @@ int main(int argc, char* argv[])
 
 	switch(option)
 	{
-	    case 1: option1(optionStats); break;
-            case 2: option2(optionStats+1); break;
-	    case 3: displayClock2(optionStats+2); break;
-	    case 4: option4(optionStats+3); break;
-	    case 5: option5(optionStats+4); break;
-	    case 6: sessionSummary(optionStats); break;
-            case 7: option4(optionStats+3); break;
-	    case 8: option5(optionStats+4); break;
+	    case 1: break;
+            case 2: break;
+	    case 3: break;
+	    case 4: break;
+	    case 5: break;
+	    case 6: break;
+            case 7: break;
+	    case 8: break;
 	    case 9: exit(EXIT_SUCCESS);
         }
-    } while(option != 7);
+    } while(option != 9);
 
     /* Deallocate all dynamically allocated memory. */
     systemFree(&gjc);
