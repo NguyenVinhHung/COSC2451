@@ -1,8 +1,8 @@
 /****************************************************************************
 * COSC2541 - Programming Techniques
 * Semester 3 2012 Assignment #2
-* Full Name        : EDIT HERE
-* Student Number   : EDIT HERE
+* Full Name        : Nguyen Vinh Hung
+* Student Number   : s3342128
 * Start up code provided by Christopher Hoobin, Xiaodong Li and Quang Tran
 ****************************************************************************/
 
@@ -35,7 +35,10 @@ int main(int argc, char* argv[])
 
     /* Testing to see if both systemInit(.) and loadData(.) are ok */
     if (initFlag == FAILURE || dataFlag == FAILURE)
+    {
+        printf("Program abort.\n");
         exit(EXIT_FAILURE);
+    }
 
     /* Interactive menu providing user with access to the 9 menu options */
     do
@@ -47,12 +50,13 @@ int main(int argc, char* argv[])
 	{
 	    printf("This option is invalid.\n");
 	    printf("Please enter a valid option, which is from 1 to 9\n\n");
+            continue;
 	}
 
 	switch(option)
 	{
-	    case 1: break;
-            case 2: break;
+	    case 1: displaySummary(&gjc, 'H'); break;
+            case 2: displaySummary(&gjc, 'C'); break;
 	    case 3: break;
 	    case 4: break;
 	    case 5: break;
