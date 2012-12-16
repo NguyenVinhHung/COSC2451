@@ -112,11 +112,11 @@ int parseMenuFile(GJCType *menu, FILE *mF)
     int len = ID_LEN + MAX_NAME_LEN + MAX_DESC_LEN + 3;  
     char record[500], *id, *type, *name, *desc;  
 
-    fgets(record, len, mF);
+    /* fgets(record, len, mF); */
 
     printf("\nStart parsing menu file\n\n");
 
-    while(record != NULL) /* read each record */
+    while(fgets(record, len, mF) != NULL) /* read each record */
     {
         id = strtok(record, "|");
         type = strtok(NULL, "|");
@@ -129,8 +129,6 @@ int parseMenuFile(GJCType *menu, FILE *mF)
         {
             return FAILURE;
         }
-
-        fgets(record, len, mF);
     }
 
     return SUCCESS;
@@ -139,13 +137,10 @@ int parseMenuFile(GJCType *menu, FILE *mF)
 /* Parse the text from submenu file */
 int parseSubmenuFile(GJCType *menu, FILE *smF)
 {
-    char *record, *id, *cId, *name, *prices[3], *desc;
     int len = ID_LEN + MAX_NAME_LEN + MAX_DESC_LEN + 3;    
-
-    record = NULL;
-
-    fgets(record, len, smF);
-    while(record != NULL) /* read each record */
+    char record[500], *id, *cId, *name, *prices[3], *desc;
+    
+    while(fgets(record, len, smF) != NULL) /* read each record */
     {
         id = strtok(record, "|");
         cId = strtok(NULL, "|");
@@ -154,6 +149,9 @@ int parseSubmenuFile(GJCType *menu, FILE *smF)
         prices[1] = strtok(NULL, "|");
         prices[2] = strtok(NULL, "|");
         desc = strtok(NULL, "|");
+
+        printf("%s + %s + %s + %s + %s + %s + %s\n", id, cId, name,
+					prices[0], prices[1], prices[2], desc);
 
         if(insertItem(menu, id, cId, name, prices, desc) == FAILURE)
         {
@@ -240,30 +238,35 @@ int insertItem(GJCType *menu, char *id, char *cId, char *name,
     if(validateBasic(id, ID_LEN)==FAILURE || (id[0]<'A' || id[0]>'Z'))
     {
         /* MENU_ERROR_MSG(); */
+printf("1\n");
         return FAILURE;
     }    
 
-    /* Parse item ID */
-    if(validateBasic(cId, 1)==FAILURE || (cId[0]!='H' && cId[0]!='C'))
+    /* Parse category ID */
+    if(validateBasic(cId, ID_LEN)==FAILURE || (cId[0]!='H' && cId[0]!='C'))
     {
+printf("2\n");
         return FAILURE;
     }
 
     /* Parse item name */
     if(validateBasic(name, MAX_NAME_LEN) == FAILURE)
     {
+printf("3\n");
         return FAILURE;
     }
 
     /* Parse item description */
     if(validateBasic(desc, MAX_DESC_LEN) == FAILURE) 
     {
+printf("4\n");
         return FAILURE;
     }
 
     ct = findCategoryById(menu, id);
     if(ct == NULL)
     {
+printf("5\n");
         return FAILURE;
     }
 
@@ -271,6 +274,7 @@ int insertItem(GJCType *menu, char *id, char *cId, char *name,
     {
         if(strToPrice(prices[i], &dollar[i], &cent[i]) == FAILURE)
         {
+printf("6\n");
             return FAILURE;
         }
     }
