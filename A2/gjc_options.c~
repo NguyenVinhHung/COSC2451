@@ -17,7 +17,29 @@
 ****************************************************************************/
 void displaySummary(GJCType *menu, char categoryType)
 {
-    
+    CategoryTypePtr curr = menu->headCategory;
+
+    if(categoryType == 'H')
+    {
+        printf("\nHot ");
+    }
+    else if(categoryType == 'C')
+    {
+        printf("\nCold ");
+    }
+
+    printf("Drinks Summary\n");
+    printf("-------------------\n");
+
+    while(curr != NULL)
+    {
+        if(curr->categoryType == categoryType)
+        {
+            displayCategory(curr);
+        }
+
+        curr = curr->nextCategory;
+    }
 }
 
 

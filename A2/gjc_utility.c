@@ -28,7 +28,7 @@ int insertItem(GJCType *, char *, char *, char *, char *[], char *);
 int strToPrice(char *, int *, int *);
 int validateBasic(char *, int);
 void exitByError(char *);
-CategoryType *findCategoryById(GJCType *, char *);
+CategoryTypePtr findCategoryById(GJCType *, char *);
 
 /****************************************************************************
 * Function readRestOfLine() is used for buffer clearing.
@@ -80,7 +80,8 @@ int loadData(GJCType *menu, char *menuFile, char *submenuFile)
         printf("Submenu file cannot be opened\n");
     }
 
-    if(mF==NULL || smF==NULL) /* Abort program if at least one file can't be opened*/
+    /* Abort program if at least one file can't be opened*/
+    if(mF==NULL || smF==NULL)
     {
         printf("Program abort\n");
         return FAILURE;
@@ -123,8 +124,6 @@ int parseMenuFile(GJCType *menu, FILE *mF)
         name = strtok(NULL, "|");
         desc = strtok(NULL, "|");
 
-	printf("%s - %s - %s - %s\n", id, type, name, desc);
-
         if(insertCategory(menu, id, type, name, desc) == FAILURE)
         {
             return FAILURE;
@@ -150,9 +149,6 @@ int parseSubmenuFile(GJCType *menu, FILE *smF)
         prices[2] = strtok(NULL, "|");
         desc = strtok(NULL, "|");
 
-        printf("%s + %s + %s + %s + %s + %s + %s\n", id, cId, name,
-					prices[0], prices[1], prices[2], desc);
-
         if(insertItem(menu, id, cId, name, prices, desc) == FAILURE)
         {
             return FAILURE;
@@ -165,7 +161,7 @@ int parseSubmenuFile(GJCType *menu, FILE *smF)
 /* Create & insert new CategoryType using the given parameters. */
 int insertCategory(GJCType *menu, char *id, char *type, char *name, char *desc)
 {
-    CategoryType *ct, *cur, *prev; /*new, current, & previous*/
+    CategoryTypePtr ct, cur, prev; /*new, current, & previous*/
         
     /* check ID*/
     if(validateBasic(id, ID_LEN)==FAILURE || (id[0]<'A' || id[0]>'Z'))
@@ -192,7 +188,7 @@ int insertCategory(GJCType *menu, char *id, char *type, char *name, char *desc)
         return FAILURE;
     }
 
-    ct = (CategoryType *)malloc(sizeof(CategoryType));
+    ct = (CategoryTypePtr)malloc(sizeof(CategoryType));
     strcpy(ct->categoryID, id);
     ct->categoryType = *type;
     strcpy(ct->categoryName, name);
@@ -215,7 +211,7 @@ int insertCategory(GJCType *menu, char *id, char *type, char *name, char *desc)
     ct->nextCategory = cur;
 
     if(prev == NULL)
-    {        
+    {
         menu->headCategory = ct;
     }
     else
@@ -223,6 +219,9 @@ int insertCategory(GJCType *menu, char *id, char *type, char *name, char *desc)
         prev->nextCategory = ct;
     }
 
+/* printf("%s - %s - %c - %s\n", ct->categoryID, ct->categoryName, 
+				ct->categoryType, ct->categoryDescription); */
+    menu->numCategories = menu->numCategories + 1;
     return SUCCESS;
 }
 
@@ -230,8 +229,8 @@ int insertCategory(GJCType *menu, char *id, char *type, char *name, char *desc)
 int insertItem(GJCType *menu, char *id, char *cId, char *name, 
                               char *prices[3], char *desc)
 {
-    ItemType *it, *cur, *prev; /*new, current, & previous*/
-    CategoryType *ct; /* The category of this submenu */
+    ItemTypePtr it, cur, prev; /*new, current, & previous*/
+    CategoryTypePtr ct; /* The category of this submenu */
     int dollar[3], cent[3], i;
     
     /* check ID */
@@ -263,7 +262,7 @@ printf("4\n");
         return FAILURE;
     }
 
-    ct = findCategoryById(menu, id);
+    ct = findCategoryById(menu, cId);
     if(ct == NULL)
     {
 printf("5\n");
@@ -313,6 +312,10 @@ printf("6\n");
         prev->nextItem = it;
     }
 
+/* printf("%s + %s + %s + %d + %d + %d + %s\n", it->itemID, it->itemName, cId,
+	     it->prices[0].dollars, it->prices[1].dollars, 
+		it->prices[2].dollars, it->itemDescription); */
+    ct->numItems = ct->numItems + 1;
     return SUCCESS;
 }
 
@@ -329,7 +332,7 @@ int strToPrice(char *price, int *dollar, int *cent)
     num -= *dollar;
     *cent = (int)(num * 100);
 
-    printf("Dollar %d - Cent %d\n", *dollar, *cent);
+/* printf("Dollar %d - Cent %d\n", *dollar, *cent); */
 
     return SUCCESS;
 }
@@ -358,15 +361,17 @@ void exitByError(char *message)
 }
 
 /* Find category by ID */
-CategoryType *findCategoryById(GJCType *menu, char *id)
+CategoryTypePtr findCategoryById(GJCType *menu, char *id)
 {
-    CategoryType *curr;
+    CategoryTypePtr curr;
     curr = menu->headCategory;
 
     while(curr != NULL)
     {
+/* printf("Finding ID: %s - %s\n", curr->categoryID, id); */
         if(strcmp(curr->categoryID, id) == 0)
         {
+/* printf("Found it\n"); */
             return curr;
         }
 
@@ -390,6 +395,37 @@ void displayMenu()
     printf("(8) Save & Exit\n");
     printf("(9) Abort\n");
     printf("Select your option (1-9): ");
+}
+
+void displayCategory(CategoryTypePtr ct)
+{
+    ItemTypePtr curr = ct->headItem;
+    float prices[3];
+    int i;
+
+    printf("\n%s - %s (%d items)\n", 
+                             ct->categoryID, ct->categoryName, ct->numItems);
+    printf("-------------------------------------------------\n");
+    printf("ID    Name                      Small Med   Large\n");
+    printf("----- ------------------------- ----- ----- -----\n");
+
+    while(curr != NULL)
+    {
+        for(i=0; i<3; i++)
+        {
+            prices[i] = (float)(curr->prices[i].dollars);
+            prices[i] += ((float)(curr->prices[i].cents)) / 100;
+        }
+
+        /* printf("%s %-25s $%d.%-2d $%d.%-2d $%d.%-2d\n", 
+                curr->itemID, curr->itemName,
+	        curr->prices[0].dollars, curr->prices[0].cents, 
+                curr->prices[1].dollars, curr->prices[1].cents, 
+		curr->prices[2].dollars, curr->prices[2].cents); */
+        printf("%s %-25s $%-4.2f $%-4.2f $%-4.2f\n", 
+                curr->itemID, curr->itemName, prices[0], prices[1], prices[2]);
+        curr = curr->nextItem;
+    }
 }
 
 /*Check if there is no '\n' in the input, or the input has error.*/

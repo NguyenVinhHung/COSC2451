@@ -15,6 +15,7 @@ int systemInit(GJCType*);
 int loadData(GJCType*, char*, char*);
 void systemFree(GJCType*);
 void displayMenu();
+void displayCategory(CategoryTypePtr);
 int validateInput(char *);
 int inputOption();
 
