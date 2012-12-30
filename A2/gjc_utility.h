@@ -23,5 +23,6 @@ int validateInput(char *);
 int isBackToMenu(char *);
 int inputOption();
 CategoryTypePtr findCategoryById(GJCType *, char *);
+void freeCatagory(CategoryTypePtr);
 
 #endif

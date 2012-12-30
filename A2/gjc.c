@@ -59,7 +59,7 @@ int main(int argc, char* argv[])
             case 2: displaySummary(&gjc, 'C'); break;
 	    case 3: categoryReport(&gjc); break;
 	    case 4: addCategory(&gjc); break;
-	    case 5: break;
+	    case 5: deleteCategory(&gjc); break;
 	    case 6: break;
             case 7: break;
 	    case 8: break;

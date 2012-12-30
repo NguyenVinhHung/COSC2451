@@ -174,18 +174,21 @@ printf("1");
     /* Parse category type */
     if(validateBasic(type, 1)==FAILURE || (type[0]!='H' && type[0]!='C'))
     {
+printf("2");
         return FAILURE;
     }
 
     /* Parse category name */
     if(validateBasic(name, MAX_NAME_LEN) == FAILURE)
     {
+printf("3");
         return FAILURE;
     }
 
     /* Parse category description */
     if(validateBasic(desc, MAX_DESC_LEN) == FAILURE) 
     {
+printf("4");
         return FAILURE;
     }
 
@@ -431,6 +434,21 @@ void systemFree(GJCType *menu)
     /* free(menu);*/
 }
 
+void freeCatagory(CategoryTypePtr c)
+{
+    ItemTypePtr prev, curr;
+    curr = c->headItem;
+
+    while(curr != NULL)
+    {
+        prev = curr;
+        curr = curr->nextItem;
+        free(prev);
+    }
+
+    
+}
+
 void exitByError(char *message)
 {
     printf("%s \nProgram abort\n", message);
@@ -445,10 +463,8 @@ CategoryTypePtr findCategoryById(GJCType *menu, char *id)
 
     while(curr != NULL)
     {
-/* printf("Finding ID: %s - %s\n", curr->categoryID, id); */
         if(strcmp(curr->categoryID, id) == 0)
         {
-/* printf("Found it\n"); */
             return curr;
         }
 

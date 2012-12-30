@@ -434,6 +434,21 @@ void systemFree(GJCType *menu)
     /* free(menu);*/
 }
 
+void freeCatagory(CategoryTypePtr c)
+{
+    ItemTypePtr prev, curr;
+    curr = c->headItem;
+
+    while(curr != NULL)
+    {
+        prev = curr;
+        curr = curr->nextItem;
+        free(prev);
+    }
+
+    free(c);
+}
+
 void exitByError(char *message)
 {
     printf("%s \nProgram abort\n", message);
@@ -448,10 +463,8 @@ CategoryTypePtr findCategoryById(GJCType *menu, char *id)
 
     while(curr != NULL)
     {
-/* printf("Finding ID: %s - %s\n", curr->categoryID, id); */
         if(strcmp(curr->categoryID, id) == 0)
         {
-/* printf("Found it\n"); */
             return curr;
         }
 

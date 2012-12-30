@@ -178,7 +178,7 @@ void addCategory(GJCType *menu)
             continue;
         }
 
-        printf("Adding new Category successful\n");
+        printf("Adding new Category successful\n\n");
         break;
     }
 }
@@ -190,6 +190,68 @@ void addCategory(GJCType *menu)
 ****************************************************************************/
 void deleteCategory(GJCType *menu)
 {
+    CategoryTypePtr prev, curr;
+    char categoryID[ID_LEN + EXTRA_SPACES], *cId;
+
+    printf("Delete Menu Category\n");
+    printf("--------------------\n");
+    printf("Warning: All menu item data for a menu category will be\n");
+    printf("deleted if you proceed.\n");
+
+    while(1)
+    {
+        printf("Menu category ID: ");
+
+        fgets(categoryID, ID_LEN + EXTRA_SPACES, stdin);
+
+        /* Check if there's an error in the input */
+        if(validateInput(categoryID) == FAILURE)
+        {
+            printf("A category ID must have 5 character. Please try again.\n");
+            continue;
+        }
+
+        /* Back to menu if the input is only Enter */
+        BACK_TO_MENU(categoryID);
+	
+        cId = strtok(categoryID, "\n");        
+        curr = menu->headCategory;
+        prev = NULL;
+
+        while(curr != NULL)
+        {
+            if(strcmp(curr->categoryID, cId) == 0)
+            {
+                break;
+            }
+            prev = curr;
+            curr = curr->nextCategory;
+        }
+
+        if(curr == NULL)
+        {
+            printf("This category ID does not exist. Please try again.\n");
+            continue;
+        }
+        else if(prev == NULL) 
+        {
+            menu->headCategory = curr->nextCategory;
+        }
+        else if(curr->nextCategory != NULL) 
+        {
+            prev->nextCategory = curr->nextCategory;
+        }
+        else
+        {
+            prev->nextCategory = NULL;
+        }
+
+        break;
+    }
+
+    printf("Category “%s – %s” deleted from the system.\n", 
+                                                      cId, curr->categoryName);
+    freeCatagory(curr);
 }
 
 
