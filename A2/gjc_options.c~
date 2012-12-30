@@ -6,6 +6,7 @@
 * Start up code provided by Christopher Hoobin, Xiaodong Li and Quang Tran
 ****************************************************************************/
 
+#include <string.h>
 #include "gjc.h"
 #include "gjc_options.h"
 #include "gjc_utility.h"
@@ -49,6 +50,40 @@ void displaySummary(GJCType *menu, char categoryType)
 ****************************************************************************/
 void categoryReport(GJCType *menu)
 {
+    CategoryTypePtr category;
+    char categoryID[ID_LEN + EXTRA_SPACES], *cId;
+    int i;
+
+    while(1)
+    {
+        printf("\nDetailed Menu Report\n");
+        printf("--------------------\n");
+        printf("Enter category id (5 characters): ");
+
+        fgets(categoryID, ID_LEN + EXTRA_SPACES, stdin);
+
+        /* Check if there's an error in the input */
+        if(validateInput(categoryID) == FAILURE)
+        {
+            printf("A category ID must have 5 character. Please try again.\n");
+            continue;
+        }
+
+        /* Back to menu if the input is only Enter */
+        BACK_TO_MENU(categoryID);
+	
+        cId = strtok(categoryID, "\n");
+        category = findCategoryById(menu, cId);
+        if(category == NULL)
+        {
+            printf("This category ID does not exist. Please try again.\n");
+            continue;
+        }
+
+        writeMenuReport(category);
+
+        return;
+    }
 }
 
 

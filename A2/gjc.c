@@ -57,7 +57,7 @@ int main(int argc, char* argv[])
 	{
 	    case 1: displaySummary(&gjc, 'H'); break;
             case 2: displaySummary(&gjc, 'C'); break;
-	    case 3: break;
+	    case 3: categoryReport(&gjc); break;
 	    case 4: break;
 	    case 5: break;
 	    case 6: break;

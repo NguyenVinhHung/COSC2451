@@ -26,6 +26,10 @@
 #define SUCCESS 1
 #define FAILURE 0
 
+#define EXTRA_SPACES 2
+
+#define BACK_TO_MENU(a) if(isBackToMenu(a) == SUCCESS) { return; }
+
 typedef struct category *CategoryTypePtr;
 typedef struct item *ItemTypePtr;
 

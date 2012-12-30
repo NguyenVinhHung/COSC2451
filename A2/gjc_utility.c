@@ -21,6 +21,7 @@
 
 #define MENU_ERROR_MSG() printf("Menu file has error.\n"); return FAILURE;
 
+
 int parseMenuFile(GJCType *, FILE *);
 int parseSubmenuFile(GJCType *, FILE *);
 int insertCategory(GJCType *, char *, char *, char *, char *);
@@ -28,7 +29,7 @@ int insertItem(GJCType *, char *, char *, char *, char *[], char *);
 int strToPrice(char *, int *, int *);
 int validateBasic(char *, int);
 void exitByError(char *);
-CategoryTypePtr findCategoryById(GJCType *, char *);
+
 
 /****************************************************************************
 * Function readRestOfLine() is used for buffer clearing.
@@ -337,6 +338,45 @@ int strToPrice(char *price, int *dollar, int *cent)
     return SUCCESS;
 }
 
+void writeMenuReport(CategoryTypePtr category)
+{
+    char *fileName;
+    FILE *file;
+    ItemTypePtr curr;
+    int i;
+
+    curr = category->headItem;
+
+    fileName = category->categoryID;
+    strcat(fileName, ".report"); /*File name's format is <category ID>.report*/
+    file = fopen(fileName, "w");
+
+    fprintf(file, "Category %s – %s – Detailed Report\n", 
+                category->categoryID, category->categoryName);
+    fprintf(file, 
+            "-------------------------------------------------------------\n");
+
+    while(curr != NULL)
+    {
+        fprintf(file, "Item ID  : %s\n", curr->itemID);
+        fprintf(file, "Item Name: %s\n", curr->itemName);
+        fprintf(file, "Prices   :");
+
+        for(i=0; i<NUM_PRICES; i++)
+        {
+            fprintf(file, " $%d.%d", 
+                          curr->prices[i].dollars, curr->prices[i].cents);
+        }
+
+        fprintf(file, "\n\n");
+
+        curr = curr->nextItem;
+    }
+
+    fclose(file);
+    printf("File %s has been created.\n\n", fileName);
+}
+
 int validateBasic(char *field, int maxLen)
 {
     if(field==NULL || strlen(field)<1 || strlen(field)>maxLen)
@@ -437,6 +477,18 @@ int validateInput(char input[])
         return FAILURE;
     }
     return SUCCESS;
+}
+
+/*Check if the user want to go back to the menu.
+  TRUE if the input is only Enter.
+*/
+int isBackToMenu(char *str)
+{
+    if(*str == '\n')
+    {
+        return SUCCESS;
+    }
+    return FAILURE;
 }
 
 /*

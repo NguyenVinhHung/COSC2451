@@ -16,7 +16,10 @@ int loadData(GJCType*, char*, char*);
 void systemFree(GJCType*);
 void displayMenu();
 void displayCategory(CategoryTypePtr);
+void writeMenuReport(CategoryTypePtr);
 int validateInput(char *);
+int isBackToMenu(char *);
 int inputOption();
+CategoryTypePtr findCategoryById(GJCType *, char *);
 
 #endif
