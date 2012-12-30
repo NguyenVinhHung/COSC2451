@@ -24,8 +24,7 @@
 
 int parseMenuFile(GJCType *, FILE *);
 int parseSubmenuFile(GJCType *, FILE *);
-int insertCategory(GJCType *, char *, char *, char *, char *);
-int insertItem(GJCType *, char *, char *, char *, char *[], char *);
+void writeDesc(FILE *, char *);
 int strToPrice(char *, int *, int *);
 int validateBasic(char *, int);
 void exitByError(char *);
@@ -165,27 +164,31 @@ int insertCategory(GJCType *menu, char *id, char *type, char *name, char *desc)
     CategoryTypePtr ct, cur, prev; /*new, current, & previous*/
         
     /* check ID*/
-    if(validateBasic(id, ID_LEN)==FAILURE || (id[0]<'A' || id[0]>'Z'))
+    if(validateBasic(id, ID_LEN)==FAILURE || id[0]!='C')
     {
         /* MENU_ERROR_MSG(); */
+printf("1");
         return FAILURE;
     }
 
     /* Parse category type */
     if(validateBasic(type, 1)==FAILURE || (type[0]!='H' && type[0]!='C'))
     {
+printf("2");
         return FAILURE;
     }
 
     /* Parse category name */
     if(validateBasic(name, MAX_NAME_LEN) == FAILURE)
     {
+printf("3");
         return FAILURE;
     }
 
     /* Parse category description */
     if(validateBasic(desc, MAX_DESC_LEN) == FAILURE) 
     {
+printf("4");
         return FAILURE;
     }
 
@@ -235,7 +238,7 @@ int insertItem(GJCType *menu, char *id, char *cId, char *name,
     int dollar[3], cent[3], i;
     
     /* check ID */
-    if(validateBasic(id, ID_LEN)==FAILURE || (id[0]<'A' || id[0]>'Z'))
+    if(validateBasic(id, ID_LEN)==FAILURE || id[0]!='I')
     {
         /* MENU_ERROR_MSG(); */
 printf("1\n");
@@ -338,16 +341,17 @@ int strToPrice(char *price, int *dollar, int *cent)
     return SUCCESS;
 }
 
+/* Write detailed menu report to file */
 void writeMenuReport(CategoryTypePtr category)
 {
-    char *fileName;
+    char *fileName = malloc(sizeof(char) * 13);
     FILE *file;
     ItemTypePtr curr;
     int i;
 
     curr = category->headItem;
-
-    fileName = category->categoryID;
+    
+    strcpy(fileName, category->categoryID);
     strcat(fileName, ".report"); /*File name's format is <category ID>.report*/
     file = fopen(fileName, "w");
 
@@ -356,6 +360,7 @@ void writeMenuReport(CategoryTypePtr category)
     fprintf(file, 
             "-------------------------------------------------------------\n");
 
+    /* Write data of each item to file */
     while(curr != NULL)
     {
         fprintf(file, "Item ID  : %s\n", curr->itemID);
@@ -367,15 +372,50 @@ void writeMenuReport(CategoryTypePtr category)
             fprintf(file, " $%d.%d", 
                           curr->prices[i].dollars, curr->prices[i].cents);
         }
+        fprintf(file, "\n");
+
+        writeDesc(file, curr->itemDescription);
 
         fprintf(file, "\n\n");
-
         curr = curr->nextItem;
     }
 
     fclose(file);
     printf("File %s has been created.\n\n", fileName);
+
+    free(fileName);
 }
+
+/* Write item description to file */
+void writeDesc(FILE *file, char *desc)
+{
+    char *word;
+    int lineLen;
+
+    lineLen = 14;
+
+    word = strtok(desc, " ");
+    fprintf(file, "Description : ");
+
+    /* Print each word to the file. If the length of current line reach 78,
+       move to next line. */
+    while(word != NULL)
+    {
+        lineLen += strlen(word) + 1;
+
+        if(lineLen >= MAX_LEN_LINE)
+        {
+            fprintf(file, "\n");
+            lineLen = 0;
+        }
+
+        fprintf(file, "%s ", word);
+        
+        word = strtok(NULL, " ");
+    }
+}
+
+
 
 int validateBasic(char *field, int maxLen)
 {

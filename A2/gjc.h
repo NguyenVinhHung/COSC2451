@@ -27,6 +27,7 @@
 #define FAILURE 0
 
 #define EXTRA_SPACES 2
+#define MAX_LEN_LINE 78
 
 #define BACK_TO_MENU(a) if(isBackToMenu(a) == SUCCESS) { return; }
 

@@ -7,6 +7,7 @@
 ****************************************************************************/
 
 #include <string.h>
+#include <stdio.h>
 #include "gjc.h"
 #include "gjc_options.h"
 #include "gjc_utility.h"
@@ -52,7 +53,6 @@ void categoryReport(GJCType *menu)
 {
     CategoryTypePtr category;
     char categoryID[ID_LEN + EXTRA_SPACES], *cId;
-    int i;
 
     while(1)
     {
@@ -93,6 +93,94 @@ void categoryReport(GJCType *menu)
 ****************************************************************************/
 void addCategory(GJCType *menu)
 {
+    char name[MAX_NAME_LEN + EXTRA_SPACES], type[1 + EXTRA_SPACES];
+    char desc[MAX_DESC_LEN + EXTRA_SPACES], id[ID_LEN + 1];
+
+    snprintf(id, ID_LEN + 1, "C%04d", menu->numCategories+1);
+
+    printf("\nAdd Menu Category\n");
+    printf("-----------------\n");
+    printf("New category ID is %s\n", id);
+
+    while(1)
+    {
+        /* Input category name & validate it */
+        while(1)
+        {
+            printf("Category Name (1-25 characters): ");
+            fgets(name, MAX_NAME_LEN + EXTRA_SPACES, stdin);
+
+            /* Check if there's an error in the input */
+            if(validateInput(name) == FAILURE)
+            {
+                printf("A category name must have 1 - 25 characters.\n");
+                printf("Please try again.\n");
+                continue;
+            }
+
+            /* Back to menu if the input is only Enter */
+            BACK_TO_MENU(name);
+            break;
+        }
+
+        /* Input category type & validate it */
+        while(1)
+        {
+            printf("(H)ot or (C)old drink?: ");
+            fgets(type, 1 + EXTRA_SPACES, stdin);
+
+            /* Check if there's an error in the input */
+            if(validateInput(type) == FAILURE)
+            {
+                printf("A category type must be (H)ot or (C)old.\n");
+                printf("Please try again.\n");
+                continue;
+            }
+
+            /* Back to menu if the input is only Enter */
+            BACK_TO_MENU(type);
+
+            if(*type!='H' && *type!='C')
+            {
+                printf("A category type must be (H)ot or (C)old.\n");
+                printf("Please try again.\n");
+                continue;
+            }
+            break;
+        }
+
+        /* Input category description & validate it */
+        while(1)
+        {
+            printf("Description (1-250 characters): ");
+            fgets(desc, MAX_DESC_LEN + EXTRA_SPACES, stdin);
+
+            /* Check if there's an error in the input */
+            if(validateInput(desc) == FAILURE)
+            {
+                printf("A category description must have 1 - 250 characters.\n");
+                printf("Please try again.\n");
+                continue;
+            }
+
+            /* Back to menu if the input is only Enter */
+            BACK_TO_MENU(desc);
+            break;
+        }
+
+        strcpy(type, strtok(type, "\n"));
+        strcpy(name, strtok(name, "\n"));
+        strcpy(desc, strtok(desc, "\n"));
+        if(insertCategory(menu, id, type, name, desc) == FAILURE)
+        {
+            printf("Invalid input.\n");
+            printf("Please try again.\n");
+            continue;
+        }
+
+        printf("Adding new Category successful\n");
+        break;
+    }
 }
 
 

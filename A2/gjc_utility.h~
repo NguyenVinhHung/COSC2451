@@ -16,6 +16,8 @@ int loadData(GJCType*, char*, char*);
 void systemFree(GJCType*);
 void displayMenu();
 void displayCategory(CategoryTypePtr);
+int insertCategory(GJCType *, char *, char *, char *, char *);
+int insertItem(GJCType *, char *, char *, char *, char *[], char *);
 void writeMenuReport(CategoryTypePtr);
 int validateInput(char *);
 int isBackToMenu(char *);
