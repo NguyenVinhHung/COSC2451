@@ -137,7 +137,7 @@ int parseMenuFile(GJCType *menu, FILE *mF)
 int parseSubmenuFile(GJCType *menu, FILE *smF)
 {
     int len = ID_LEN + MAX_NAME_LEN + MAX_DESC_LEN + 3;    
-    char record[500], *id, *cId, *name, *prices[3], *desc;
+    char record[500], *id, *cId, *name, *prices[NUM_PRICES], *desc;
     
     while(fgets(record, len, smF) != NULL) /* read each record */
     {
@@ -147,7 +147,7 @@ int parseSubmenuFile(GJCType *menu, FILE *smF)
         prices[0] = strtok(NULL, "|");
         prices[1] = strtok(NULL, "|");
         prices[2] = strtok(NULL, "|");
-        desc = strtok(NULL, "|");
+        desc = strtok(NULL, "|");        
 
         if(insertItem(menu, id, cId, name, prices, desc) == FAILURE)
         {
@@ -196,7 +196,7 @@ printf("4");
     strcpy(ct->categoryID, id);
     ct->categoryType = *type;
     strcpy(ct->categoryName, name);
-    strcpy(ct->categoryDescription, desc);
+    strcpy(ct->categoryDescription, strtok(desc, "\n"));
 
     ct->headItem = NULL;
     ct->numItems = 0;
@@ -231,11 +231,11 @@ printf("4");
 
 /* Create & insert new ItemType using the given parameters. */
 int insertItem(GJCType *menu, char *id, char *cId, char *name, 
-                              char *prices[3], char *desc)
+                              char *prices[NUM_PRICES], char *desc)
 {
     ItemTypePtr it, cur, prev; /*new, current, & previous*/
     CategoryTypePtr ct; /* The category of this submenu */
-    int dollar[3], cent[3], i;
+    int dollar[NUM_PRICES], cent[NUM_PRICES], i;
     
     /* check ID */
     if(validateBasic(id, ID_LEN)==FAILURE || id[0]!='I')
@@ -273,7 +273,7 @@ printf("5\n");
         return FAILURE;
     }
 
-    for(i=0; i<3; i++)
+    for(i=0; i<NUM_PRICES; i++)
     {
         if(strToPrice(prices[i], &dollar[i], &cent[i]) == FAILURE)
         {
@@ -285,10 +285,10 @@ printf("6\n");
     it = (ItemType *)malloc(sizeof(ItemType));
     strcpy(it->itemID, id);
     strcpy(it->itemName, name);
-    strcpy(it->itemDescription, desc);    
+    strcpy(it->itemDescription, strtok(desc, "\n"));    
     it->nextItem = NULL;
     
-    for(i=0; i<3; i++)
+    for(i=0; i<NUM_PRICES; i++)
     {
         it->prices[i].dollars = dollar[i];
         it->prices[i].cents = cent[i];
@@ -389,12 +389,12 @@ void writeMenuReport(CategoryTypePtr category)
 /* Write item description to file */
 void writeDesc(FILE *file, char *desc)
 {
-    char *word;
+    char *word, data[MAX_DESC_LEN + 1];
     int lineLen;
 
     lineLen = 14;
-
-    word = strtok(desc, " ");
+    strcpy(data, desc);
+    word = strtok(data, " ");
     fprintf(file, "Description : ");
 
     /* Print each word to the file. If the length of current line reach 78,
@@ -414,8 +414,6 @@ void writeDesc(FILE *file, char *desc)
         word = strtok(NULL, " ");
     }
 }
-
-
 
 int validateBasic(char *field, int maxLen)
 {
@@ -447,6 +445,42 @@ void freeCatagory(CategoryTypePtr c)
     }
 
     free(c);
+}
+
+int freeItem(CategoryTypePtr c, char *itemId)
+{    
+    ItemTypePtr prev, curr;
+    
+    curr = c->headItem;
+    prev = NULL;
+
+    while(curr != NULL)
+    {
+        if(strcmp(itemId, curr->itemID) == 0)
+        {
+            break;
+        }
+        prev = curr;
+        curr = curr->nextItem;        
+    }
+
+    if(curr == NULL)
+    {
+        return FAILURE;
+    }
+    else if(prev == NULL) 
+    {
+        c->headItem = curr->nextItem;
+    }
+    else
+    {
+        prev->nextItem = curr->nextItem;
+    }
+
+    printf("Menu item “%s – %s” deleted from system.\n", 
+                                              curr->itemID, curr->itemName);
+    free(curr);    
+    return SUCCESS;
 }
 
 void exitByError(char *message)

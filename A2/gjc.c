@@ -60,9 +60,9 @@ int main(int argc, char* argv[])
 	    case 3: categoryReport(&gjc); break;
 	    case 4: addCategory(&gjc); break;
 	    case 5: deleteCategory(&gjc); break;
-	    case 6: break;
-            case 7: break;
-	    case 8: break;
+	    case 6: addItem(&gjc); break;
+            case 7: deleteItem(&gjc); break;
+	    case 8: saveData(&gjc, argv[1], argv[2]); break;
 	    case 9: exit(EXIT_SUCCESS);
         }
     } while(option != 9);

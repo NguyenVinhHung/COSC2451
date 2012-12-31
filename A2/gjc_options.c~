@@ -193,7 +193,7 @@ void deleteCategory(GJCType *menu)
     CategoryTypePtr prev, curr;
     char categoryID[ID_LEN + EXTRA_SPACES], *cId;
 
-    printf("Delete Menu Category\n");
+    printf("\nDelete Menu Category\n");
     printf("--------------------\n");
     printf("Warning: All menu item data for a menu category will be\n");
     printf("deleted if you proceed.\n");
@@ -237,13 +237,9 @@ void deleteCategory(GJCType *menu)
         {
             menu->headCategory = curr->nextCategory;
         }
-        else if(curr->nextCategory != NULL) 
-        {
-            prev->nextCategory = curr->nextCategory;
-        }
         else
         {
-            prev->nextCategory = NULL;
+            prev->nextCategory = curr->nextCategory;
         }
 
         break;
@@ -262,6 +258,148 @@ void deleteCategory(GJCType *menu)
 ****************************************************************************/
 void addItem(GJCType *menu)
 {
+    CategoryTypePtr category;
+    char cId[ID_LEN + EXTRA_SPACES], id[ID_LEN + 1];
+    char name[MAX_NAME_LEN + EXTRA_SPACES], desc[MAX_DESC_LEN + EXTRA_SPACES];
+    char *prices[NUM_PRICES], p[NUM_PRICES][4 + EXTRA_SPACES];
+    int i;
+    float num;
+
+    printf("Add Menu Item\n");
+    printf("-------------\n");
+    
+    while(1)
+    {
+        /* Input category ID & validate it */
+        while(1)
+        {
+            printf("Category ID (5 characters): ");
+            fgets(cId, ID_LEN + EXTRA_SPACES, stdin);
+
+            /* Check if there's an error in the input */
+            if(validateInput(cId)==FAILURE)
+            {
+                printf("Invalid ID.\n");
+                printf("Please try again.\n");
+                continue;
+            }
+
+            /* Back to menu if the input is only Enter */
+            BACK_TO_MENU(cId);
+
+            /* Check if there's an error in the input's format */
+            strcpy(cId, strtok(cId, "\n"));            
+            if(cId[0]!='C' || strlen(cId)!=ID_LEN)
+            {
+                printf("A category ID must have letter C at the beginning");
+                printf(" following by 4 digits\n");
+                printf("Please try again.\n");
+                continue;
+            }
+            
+            category = findCategoryById(menu, cId);
+
+            if(category == NULL)
+            {
+                printf("This category ID does not exist. Please try again.\n");
+                continue;
+            }
+
+            break;
+        }
+
+        snprintf(id, ID_LEN + 1, "I%04d", category->numItems+1);
+        printf("New item ID is %s.\n", id);
+
+        /* Input item name & validate it */
+        while(1)
+        {
+            printf("Item Name (1-25 characters): ");
+            fgets(name, MAX_NAME_LEN + EXTRA_SPACES, stdin);
+
+            /* Check if there's an error in the input */
+            if(validateInput(name) == FAILURE)
+            {
+                printf("A item name must have 1 - 25 characters.\n");
+                printf("Please try again.\n");
+                continue;
+            }
+
+            /* Back to menu if the input is only Enter */
+            BACK_TO_MENU(name);
+            break;
+        }
+
+        for(i=0; i<NUM_PRICES; i++)
+        {
+            while(1)
+            {
+                switch(i)
+                {
+                    case 0: printf("Small "); break;
+                    case 1: printf("Medium "); break;
+                    case 2: printf("Large ");
+                }
+
+                printf("Price ($0.05-$9.95): ");
+                fgets(p[i], 4 + EXTRA_SPACES, stdin);
+
+                /* Check if there's an error in the input */
+                if(validateInput(p[i]) == FAILURE)
+                {
+                    printf("Invalid price.\n");
+                    printf("Please try again.\n");
+                    continue;
+                }
+
+                /* Back to menu if the input is only Enter */
+                BACK_TO_MENU(p[i]);
+
+                /* Check if the input price's format is wrong */
+                if(sscanf(p[i], "%f", &num) == EOF)
+                {
+                    printf("Invalid price.\n");
+                    printf("Please try again.\n");
+                    continue;
+                }
+                
+                prices[i] = strtok(p[i], "\n");
+                /*strcpy(prices[i], prices[i]);*/
+                break;
+            }
+        }
+
+        /* Input item description & validate it */
+        while(1)
+        {
+            printf("Description (1-250 characters): ");
+            fgets(desc, MAX_DESC_LEN + EXTRA_SPACES, stdin);
+
+            /* Check if there's an error in the input */
+            if(validateInput(desc) == FAILURE)
+            {
+                printf("An item description must have 1 - 250 characters.\n");
+                printf("Please try again.\n");
+                continue;
+            }
+
+            /* Back to menu if the input is only Enter */
+            BACK_TO_MENU(desc);
+            break;
+        }
+        
+        strcpy(name, strtok(name, "\n"));
+        strcpy(desc, strtok(desc, "\n"));
+        if(insertItem(menu, id, cId, name, prices, desc) == FAILURE)
+        {
+            printf("Invalid input.\n");
+            printf("Please try again.\n");
+            continue;
+        }
+
+        printf("Adding new Item successful\n\n");
+        break;
+    }
 }
 
 
@@ -271,6 +409,71 @@ void addItem(GJCType *menu)
 ****************************************************************************/
 void deleteItem(GJCType *menu)
 {
+    CategoryTypePtr c;
+    
+    char categoryID[ID_LEN + EXTRA_SPACES], itemID[ID_LEN + EXTRA_SPACES];
+
+    printf("\nDelete Menu Item\n");
+    printf("--------------------\n");
+
+    /* Input category ID and find the category */
+    while(1)
+    {
+        printf("Category ID (5 characters): ");
+        fgets(categoryID, ID_LEN + EXTRA_SPACES, stdin);
+
+        /* Check if there's an error in the input */
+        if(validateInput(categoryID) == FAILURE)
+        {
+            printf("A category ID must have 5 character.");
+            printf("Please try again.\n");
+            continue;
+        }
+
+        /* Back to menu if the input is only Enter */
+        BACK_TO_MENU(categoryID);
+
+        /* cId = strtok(categoryID, "\n"); */
+        strcpy(categoryID, strtok(categoryID, "\n"));
+        c = findCategoryById(menu, categoryID);
+
+        if(c == NULL)
+        {
+            printf("This category ID does not exist. Please try again.\n");
+            continue;
+        }
+
+        break;
+    }
+
+    /* Input the item ID and free the item */
+    while(1)
+    {
+        printf("Item ID (5 characters): ");
+        fgets(itemID, ID_LEN + EXTRA_SPACES, stdin);
+
+        /* Check if there's an error in the input */
+        if(validateInput(itemID) == FAILURE)
+        {
+            printf("An item ID must have 5 character.");
+            printf("Please try again.\n");
+            continue;
+        }
+
+        /* Back to menu if the input is only Enter */
+        BACK_TO_MENU(itemID);
+	
+        /* cId = strtok(categoryID, "\n"); */
+        strcpy(itemID, strtok(itemID, "\n"));            
+
+        if(freeItem(c, itemID) == FAILURE)
+        {
+            printf("This item ID does not exist. Please try again.\n");
+            continue;
+        }
+
+        break;
+    }
 }
 
 
@@ -281,4 +484,38 @@ void deleteItem(GJCType *menu)
 ****************************************************************************/
 void saveData(GJCType *menu, char *menuFile, char *submenuFile)
 {
+    FILE *menuF, *submenuF;
+    CategoryTypePtr category;
+    ItemTypePtr item;
+
+    menuF = fopen(menuFile, "w");
+    submenuF = fopen(submenuFile, "w");
+    category = menu->headCategory;
+
+    while(category != NULL)
+    {
+        item = category->headItem;
+
+        fprintf(menuF, "%s|%c|%s|%s", 
+                       category->categoryID, category->categoryType, 
+                       category->categoryName, category->categoryDescription);
+
+        while(item != NULL)
+        {
+            fprintf(submenuF, "%s|%s|%s|%d.%02d|%d.%02d|%d.%02d|%s", 
+                       item->itemID, category->categoryID, 
+                       item->itemName, 
+                       item->prices[0].dollars, item->prices[0].cents, 
+                       item->prices[1].dollars, item->prices[1].cents, 
+                       item->prices[2].dollars, item->prices[2].cents, 
+                       item->itemDescription);
+
+            item = item->nextItem;
+        }
+
+        category = category->nextCategory;
+    }
+
+    fclose(menuF);
+    fclose(submenuF);
 }
