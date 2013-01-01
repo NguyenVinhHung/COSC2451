@@ -26,6 +26,7 @@ int parseMenuFile(GJCType *, FILE *);
 int parseSubmenuFile(GJCType *, FILE *);
 void writeDesc(FILE *, char *);
 int strToPrice(char *, int *, int *);
+int idToInt(char *);
 int validateBasic(char *, int);
 void exitByError(char *);
 
@@ -285,7 +286,7 @@ printf("6\n");
     it = (ItemType *)malloc(sizeof(ItemType));
     strcpy(it->itemID, id);
     strcpy(it->itemName, name);
-    strcpy(it->itemDescription, strtok(desc, "\n"));    
+    strcpy(it->itemDescription, strtok(desc, "\n"));
     it->nextItem = NULL;
     
     for(i=0; i<NUM_PRICES; i++)
@@ -323,6 +324,7 @@ printf("6\n");
     return SUCCESS;
 }
 
+/* Convert a price as a string into an integer */
 int strToPrice(char *price, int *dollar, int *cent)
 {
     float num; /*The price in float*/
@@ -339,6 +341,77 @@ int strToPrice(char *price, int *dollar, int *cent)
 /* printf("Dollar %d - Cent %d\n", *dollar, *cent); */
 
     return SUCCESS;
+}
+
+/* Convert the 4 digits of an ID into an integer */
+int idToInt(char *id)
+{
+    int i, j;
+    char num[5];
+
+    for(i=1; i<5; i++)
+    {
+        if(*(id+i) != '0')
+        {
+            break;
+        }
+        if(i == 4)
+        {
+            return 0;
+        }
+    }
+
+    for(j=0; i<5; i++, j++)
+    {
+        num[j] = *(id+i);
+    }
+
+    num[j] = '\n';
+
+    return atoi(num);
+}
+
+void generateCategoryId(GJCType *menu, char id[ID_LEN + 1])
+{
+    CategoryTypePtr c = menu->headCategory;    
+    int i, j;
+
+    i = 0;
+    while(c != NULL)
+    {
+        j = idToInt(c->categoryID);
+        printf("C%04d\n", j);
+
+        if(i < j)
+        {
+            i = j;
+        }
+        c = c->nextCategory;
+    }
+
+    i++;
+    snprintf(id, ID_LEN + 1, "C%04d", i);
+}
+
+void generateItemId(GJCType *menu, ItemTypePtr  item, char id[ID_LEN + 1])
+{
+    int i, j;
+
+    i = 0;
+    while(item != NULL)
+    {
+        j = idToInt(item->itemID);
+        printf("I%04d\n", j);
+
+        if(i < j)
+        {
+            i = j;
+        }
+        item = item->nextItem;
+    }
+
+    i++;
+    snprintf(id, ID_LEN + 1, "I%04d", i);
 }
 
 /* Write detailed menu report to file */

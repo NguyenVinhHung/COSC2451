@@ -14,15 +14,23 @@ void readRestOfLine();
 int systemInit(GJCType*);
 int loadData(GJCType*, char*, char*);
 void systemFree(GJCType*);
+
 void displayMenu();
 void displayCategory(CategoryTypePtr);
+
 int insertCategory(GJCType *, char *, char *, char *, char *);
 int insertItem(GJCType *, char *, char *, char *, char *[], char *);
+
+void generateCategoryId(GJCType *, char *);
+void generateItemId(GJCType *, ItemTypePtr, char *)
+
 void writeMenuReport(CategoryTypePtr);
+
 int validateInput(char *);
 int isBackToMenu(char *);
 int inputOption();
 CategoryTypePtr findCategoryById(GJCType *, char *);
+
 void freeCatagory(CategoryTypePtr);
 int freeItem(CategoryTypePtr, char *);
 

@@ -96,7 +96,9 @@ void addCategory(GJCType *menu)
     char name[MAX_NAME_LEN + EXTRA_SPACES], type[1 + EXTRA_SPACES];
     char desc[MAX_DESC_LEN + EXTRA_SPACES], id[ID_LEN + 1];
 
-    snprintf(id, ID_LEN + 1, "C%04d", menu->numCategories+1);
+    /* Generate Category ID */
+    /*snprintf(id, ID_LEN + 1, "C%04d", menu->numCategories+1);*/
+    generateCategoryId(menu, id);
 
     printf("\nAdd Menu Category\n");
     printf("-----------------\n");
@@ -248,6 +250,8 @@ void deleteCategory(GJCType *menu)
     printf("Category “%s – %s” deleted from the system.\n", 
                                                       cId, curr->categoryName);
     freeCatagory(curr);
+
+    menu->numCategories = menu->numCategories - 1;
 }
 
 
@@ -308,7 +312,9 @@ void addItem(GJCType *menu)
             break;
         }
 
-        snprintf(id, ID_LEN + 1, "I%04d", category->numItems+1);
+        /* Generate Item ID */
+        /*snprintf(id, ID_LEN + 1, "I%04d", category->numItems+1);*/
+        generateItemId(menu, category->headItem, id);
         printf("New item ID is %s.\n", id);
 
         /* Input item name & validate it */
@@ -474,6 +480,8 @@ void deleteItem(GJCType *menu)
 
         break;
     }
+
+    c->numItems = c->numItems - 1;
 }
 
 

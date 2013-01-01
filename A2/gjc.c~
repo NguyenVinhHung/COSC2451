@@ -6,6 +6,8 @@
 * Start up code provided by Christopher Hoobin, Xiaodong Li and Quang Tran
 ****************************************************************************/
 
+#include <string.h>
+
 #include "gjc.h"
 #include "gjc_options.h"
 #include "gjc_utility.h"
@@ -39,6 +41,9 @@ int main(int argc, char* argv[])
         printf("Program abort.\n");
         exit(EXIT_FAILURE);
     }
+
+    printf("\n\nCheck: %d\n\n", atoi(strtok("C0012", "C")));
+
 
     /* Interactive menu providing user with access to the 9 menu options */
     do
