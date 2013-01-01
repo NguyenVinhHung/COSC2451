@@ -371,6 +371,7 @@ int idToInt(char *id)
     return atoi(num);
 }
 
+/* Generate new category ID */
 void generateCategoryId(GJCType *menu, char id[ID_LEN + 1])
 {
     CategoryTypePtr c = menu->headCategory;    
@@ -393,6 +394,7 @@ void generateCategoryId(GJCType *menu, char id[ID_LEN + 1])
     snprintf(id, ID_LEN + 1, "C%04d", i);
 }
 
+/* Generate new item ID */
 void generateItemId(GJCType *menu, ItemTypePtr  item, char id[ID_LEN + 1])
 {
     int i, j;
@@ -502,7 +504,16 @@ int validateBasic(char *field, int maxLen)
 ****************************************************************************/
 void systemFree(GJCType *menu)
 {
-    /* free(menu);*/
+    CategoryTypePtr curr, prev;
+
+    curr = menu->headCategory;
+
+    while(curr != NULL)
+    {
+        prev = curr;
+        curr = curr->nextCategory;
+        freeCatagory(prev);
+    }
 }
 
 void freeCatagory(CategoryTypePtr c)
